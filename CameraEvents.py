@@ -256,12 +256,11 @@ class DahuaDevice():
                     if not self.client.connected_flag:
                         self.client.reconnect()
                     self.client.publish(self.basetopic +"/" + Alarm["Code"] + "/" + Alarm["channel"] ,"ON")
-                    if self.alerts:
+                    #if self.alerts:
                         #possible new process:
-                        #http://192.168.10.66/cgi-bin/snapManager.cgi?action=attachFileProc&Flags[0]=Event&Events=[VideoMotion%2CVideoLoss]
-                        process = threading.Thread(target=self.SnapshotImage,args=(index+self.snapshotoffset,Alarm["channel"],"Motion Detected: {0}".format(Alarm["channel"])))
-                        process.daemon = True                            # Daemonize thread
-                        process.start()    
+                        #process = threading.Thread(target=self.SnapshotImage,args=(index+self.snapshotoffset,Alarm["channel"],"Motion Detected: {0}".format(Alarm["channel"])))
+                        #process.daemon = True                            # Daemonize thread
+                        #process.start()    
                 else:
                     self.client.publish(self.basetopic +"/" + Alarm["Code"] + "/" + Alarm["channel"] ,"OFF")
             elif Alarm["Code"] ==  "CrossRegionDetection" or Alarm["Code"] ==  "CrossLineDetection":
@@ -283,12 +282,11 @@ class DahuaDevice():
                         _LOGGER.error("Error getting IVS data: " + str(ivsExcept))
                         
                     self.client.publish(self.basetopic +"/IVS/" + Alarm["channel"] ,regionText)
-                    if self.alerts:
+                    #if self.alerts:
                             #possible new process:
-                            #http://192.168.10.66/cgi-bin/snapManager.cgi?action=attachFileProc&Flags[0]=Event&Events=[VideoMotion%2CVideoLoss]
-                            process = threading.Thread(target=self.SnapshotImage,args=(index+self.snapshotoffset,Alarm["channel"],"IVS: {0}: {1}".format(Alarm["channel"],regionText)))
-                            process.daemon = True                            # Daemonize thread
-                            process.start() 
+                            #process = threading.Thread(target=self.SnapshotImage,args=(index+self.snapshotoffset,Alarm["channel"],"IVS: {0}: {1}".format(Alarm["channel"],regionText)))
+                            #process.daemon = True                            # Daemonize thread
+                            #process.start() 
             else:
                 _LOGGER.info("dahua_event_received: "+  Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"])
                 self.client.publish(self.basetopic +"/" + Alarm["channel"] + "/" + Alarm["name"],Alarm["Code"])
