@@ -1,4 +1,4 @@
-# CameraEvents [![Build Status](https://travis-ci.com/psyciknz/CameraEvents.svg?branch=master)](https://travis-ci.com/psyciknz/CameraEvents)
+# DahuaEvents [![Build Status](https://travis-ci.com/psyciknz/CameraEvents.svg?branch=master)](https://travis-ci.com/psyciknz/CameraEvents)
 
 
 
