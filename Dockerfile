@@ -8,7 +8,11 @@ RUN apt-get update
 RUN apt-get install nano
 
 # install python libraries (TODO: any others?)
-RUN pip install paho-mqtt requests ConfigParser pycurl
+
+RUN pip install paho-mqtt 
+RUN pip install requests 
+RUN pip install ConfigParser 
+RUN pip install pycurl
 
 # build /opt/mqttwarn
 RUN mkdir -p /opt/cameraevents
