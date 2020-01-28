@@ -6,6 +6,7 @@ FROM python:3.8-slim-buster
 
 RUN apt-get update
 RUN apt-get install nano
+RUN apt-get -y install gcc
 RUN apt-get -y install libcurl4-openssl-dev libssl-dev
 # install python libraries (TODO: any others?)
 
