@@ -196,18 +196,18 @@ class DahuaDevice():
             if image is not None and len(image) > 0:
                 #construct image payload
                 #{{ \"message\": \"Motion Detected: {0}\", \"imagebase64\": \"{1}\" }}"
-                imgpayload = base64.encodestring(image)
-                msgpayload = json.dumps({"message":message,"imagebase64":imgpayload})
+                #imgpayload = base64.encodestring(image)
+                msgpayload = json.dumps({"message":message,"image":image})
                 #msgpayload = "{{ \"message\": \"{0}\", \"imagebase64\": \"{1}\" }}".format(message,imgpayload)
                 
                 self.client.publish(self.basetopic +"/{0}/Image".format(channelName),msgpayload)
         except Exception as ex:
             _LOGGER.error("Error sending image: " + str(ex))
             try:
-                imagepayload = ""
+                image = ""
                 with open("default.png", 'rb') as thefile:
-                    imagepayload = thefile.read().encode("base64")
-                msgpayload = json.dumps({"message":"ERR:" + message, "imagebase64": imagepayload})
+                    image = thefile.read()
+                msgpayload = json.dumps({"message":"ERR:" + message, "image": image})
                 self.client.publish(self.basetopic +"/{0}/Image".format(channelName),msgpayload)
             except:
                 pass
