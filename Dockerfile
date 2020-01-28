@@ -4,6 +4,9 @@ FROM python:3.8-slim-buster
 
 # based on https://github.com/pfichtner/docker-mqttwarn
 
+RUN apt-get update
+RUN apt-get install nano
+
 # install python libraries (TODO: any others?)
 RUN pip install paho-mqtt requests ConfigParser pycurl
 
