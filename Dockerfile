@@ -1,6 +1,6 @@
-FROM __BASEIMAGE_ARCH__/python:2.7.15-jessie
+FROM python:3.8-slim-buster
 
-__CROSS_COPY qemu/qemu-__QEMU_ARCH__-static /usr/bin/
+#__CROSS_COPY qemu/qemu-__QEMU_ARCH__-static /usr/bin/
 
 # based on https://github.com/pfichtner/docker-mqttwarn
 
