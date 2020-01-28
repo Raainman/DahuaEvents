@@ -66,8 +66,7 @@ class DahuaDevice():
     #EVENT_TEMPLATE = "{protocol}://{host}:{port}/cgi-bin/eventManager.cgi?action=attach&channel=0&codes=%5B{events}%5D"
     EVENT_TEMPLATE = "{protocol}://{host}:{port}/cgi-bin/eventManager.cgi?action=attach&codes=%5B{events}%5D"
     CHANNEL_TEMPLATE = "{protocol}://{host}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=ChannelTitle"
-    #SNAPSHOT_TEMPLATE = "{protocol}://{host}:{port}/cgi-bin/snapshot.cgi?channel={channel}"
-    SNAPSHOT_TEMPLATE = "{protocol}://{host}:{port}/cgi-bin/snapshot.cgi?1"
+    SNAPSHOT_TEMPLATE = "{protocol}://{host}:{port}/cgi-bin/snapshot.cgi?channel={channel}"
     #SNAPSHOT_TEMPLATE = "{protocol}://{host}:{port}/cgi-bin/snapshot.cgi?chn={channel}"
     SNAPSHOT_EVENT = "{protocol}://{host}:{port}/cgi-bin/eventManager.cgi?action=attachFileProc&Flags[0]=Event&Events=%5B{events}%5D"
      #cgi-bin/snapManager.cgi?action=attachFileProc&Flags[0]=Event&Events=[VideoMotion%2CVideoLoss]    
@@ -196,18 +195,18 @@ class DahuaDevice():
             if image is not None and len(image) > 0:
                 #construct image payload
                 #{{ \"message\": \"Motion Detected: {0}\", \"imagebase64\": \"{1}\" }}"
-                #imgpayload = base64.encodestring(image)
-                msgpayload = json.dumps({"message":message,"image":image})
+                imgpayload = base64.encodestring(image)
+                msgpayload = json.dumps({"message":message,"imagebase64":imgpayload})
                 #msgpayload = "{{ \"message\": \"{0}\", \"imagebase64\": \"{1}\" }}".format(message,imgpayload)
                 
                 self.client.publish(self.basetopic +"/{0}/Image".format(channelName),msgpayload)
         except Exception as ex:
             _LOGGER.error("Error sending image: " + str(ex))
             try:
-                image = ""
+                imagepayload = ""
                 with open("default.png", 'rb') as thefile:
-                    image = thefile.read()
-                msgpayload = json.dumps({"message":"ERR:" + message, "image": image})
+                    imagepayload = thefile.read().encode("base64")
+                msgpayload = json.dumps({"message":"ERR:" + message, "imagebase64": imagepayload})
                 self.client.publish(self.basetopic +"/{0}/Image".format(channelName),msgpayload)
             except:
                 pass
