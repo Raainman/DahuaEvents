@@ -272,7 +272,7 @@ class DahuaDevice():
                         #process.start()
                 else:
                     self.client.publish(self.basetopic +"/" + Alarm["Code"] + "/" + Alarm["channel"], "OFF")
-                elif Alarm["Code"] ==  "CrossRegionDetection" or Alarm["Code"] ==  "CrossLineDetection":
+            elif Alarm["Code"] ==  "CrossRegionDetection" or Alarm["Code"] ==  "CrossLineDetection":
                 if Alarm["action"] == "Start":
                     regionText = Alarm["Code"]
                     try:
