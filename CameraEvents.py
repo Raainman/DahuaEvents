@@ -258,9 +258,8 @@ class DahuaDevice():
 
             if Alarm["Code"] == "VideoMotion":
                 VideoMotionData = json.loads(Alarm["data"])
-                RegionName = json.dumps (VideoMotionData)
-                _LOGGER.info("Video Motion received: "+  Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"] + " RegionName ")
-                _LOGGER.info("Region: " + RegionName)
+                RegionName = ', '.join(VideoMotionData["RegionName"])
+                _LOGGER.info("Video Motion received: "+  Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"] + " RegionName: " + RegionName)
                 if Alarm["action"] == "Start":
                     if not self.client.connected_flag:
                         self.client.reconnect()
