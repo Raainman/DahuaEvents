@@ -247,7 +247,7 @@ class DahuaDevice():
             Alarm = dict()
             Alarm["name"] = self.Name
             for KeyValue in Line.split(';'):
-                Key, Value = KeyValue.split(' = ')
+                Key, Value = KeyValue.split('=')
                 Alarm[Key] = Value
 
             index =  int(Alarm["index"]        )
