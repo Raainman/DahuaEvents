@@ -14,12 +14,12 @@ Removed all the image processing (snapshots), because I got errors that base64 e
 
 ToDo:
 Change json message for VideoMotion message, include the RegionName.
-    VideoMotion;action=Start;index=0;data={
+    VideoMotion;action = Start;index = 0;data = {
        "Id" : [ 0 ],
        "RegionName" : [ "Oprit" ],
        "SmartMotionEnable" : true
     }
-    VideoMotion;action=Stop;index=0;data={
+    VideoMotion;action = Stop;index = 0;data = {
       "Id" : [ 0 ],
        "RegionName" : [ "Oprit" ],
        "SmartMotionEnable" : true
@@ -56,7 +56,7 @@ import base64
 
 version = "0.1.3"
 
-mqttc = paho.Client("CameraEvents-" + socket.gethostname(), clean_session=True)
+mqttc = paho.Client("CameraEvents-" + socket.gethostname(), clean_session = True)
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.setLevel(logging.DEBUG)
@@ -72,14 +72,14 @@ _LOGGER.addHandler(ch)
 
 
 
-def setup( config):
+def setup(config):
     """Set up Dahua event listener."""
     #config = config.get(DOMAIN)
 
     dahua_event = DahuaEventThread(
         None,
         None
-    )
+   )
 
     def _start_dahua_event(_event):
         dahua_event.start()
@@ -96,8 +96,8 @@ class DahuaDevice():
     SNAPSHOT_TEMPLATE = "{protocol}://{host}:{port}/cgi-bin/snapshot.cgi?channel={channel}"
     #SNAPSHOT_TEMPLATE = "{protocol}://{host}:{port}/cgi-bin/snapshot.cgi?1"
     #SNAPSHOT_TEMPLATE = "{protocol}://{host}:{port}/cgi-bin/snapshot.cgi?chn={channel}"
-    SNAPSHOT_EVENT = "{protocol}://{host}:{port}/cgi-bin/eventManager.cgi?action=attachFileProc&Flags[0]=Event&Events=%5B{events}%5D"
-    #cgi-bin/snapManager.cgi?action=attachFileProc&Flags[0]=Event&Events=[VideoMotion%2CVideoLoss]
+    SNAPSHOT_EVENT = "{protocol}://{host}:{port}/cgi-bin/eventManager.cgi?action = attachFileProc&Flags[0]=Event&Events=%5B{events}%5D"
+    #cgi-bin/snapManager.cgi?action = attachFileProc&Flags[0]=Event&Events=[VideoMotion%2CVideoLoss]
 
 
 
@@ -126,12 +126,12 @@ class DahuaDevice():
 
         #generate the event url
         self.url = self.EVENT_TEMPLATE.format(
-            protocol=self.protocol,
-            host=self.host,
-            port=self.port,
-            events=device_cfg.get("events")
+            protocol = self.protocol,
+            host = self.host,
+            port = self.port,
+            events = device_cfg.get("events")
 
-        )
+       )
 
 
         self.isNVR = False
@@ -142,25 +142,25 @@ class DahuaDevice():
             if self.isNVR:
                 #generate the channel url
                 self.channelurl  = self.CHANNEL_TEMPLATE.format(
-                    protocol=device_cfg.get("protocol"),
-                    host=device_cfg.get("host"),
-                    port=device_cfg.get("port")
-                )
+                    protocol = device_cfg.get("protocol"),
+                    host = device_cfg.get("host"),
+                    port = device_cfg.get("port")
+               )
                 self.snapshotevents = self.SNAPSHOT_EVENT.format(
-                    protocol=self.protocol,
-                    host=self.host,
-                    port=self.port,
-                    events=device_cfg.get("events")
-                )
+                    protocol = self.protocol,
+                    host = self.host,
+                    port = self.port,
+                    events = device_cfg.get("events")
+               )
 
                 #RPCConnect(1)
 
                 # get channel names here
-                #table.ChannelTitle[0].Name=Garage
+                #table.ChannelTitle[0].Name = Garage
                 _LOGGER.debug("Device " + name + " Getting channel ids: " + self.channelurl)
-                response = requests.get(self.channelurl,auth=requests.auth.HTTPDigestAuth(self.user,self.password))
+                response = requests.get(self.channelurl, auth = requests.auth.HTTPDigestAuth(self.user, self.password))
                 for line in response.text.splitlines():
-                    match = re.search(r'.\[(?P<index>[0-4])\]\..+\=(?P<channel>.+)',line)
+                    match = re.search(r'.\[(?P<index>[0-4])\]\..+\=(?P<channel>.+)', line)
                     if match:
                         _index = int(match.group("index"))
                         _channel = match.group("channel")
@@ -175,7 +175,7 @@ class DahuaDevice():
             _LOGGER.debug("Device " + name + " is not an NVR")
 
 
-    def channelIsMine(self,channelname="",channelid=-1):
+    def channelIsMine(self, channelname = "", channelid = -1):
         for channel in self.channels:
             if channelname is not None and channelname == self.channels[channel]:
                 return channel
@@ -186,27 +186,27 @@ class DahuaDevice():
 
     def SnapshotImage(self, channel, channelName, message):
         imageurl  = self.SNAPSHOT_TEMPLATE.format(
-                host=self.host,
-                protocol=self.protocol,
-                port  = self.port,
-                channel=channel
-            )
+                host = self.host, 
+                protocol = self.protocol, 
+                port  = self.port, 
+                channel = channel
+           )
         image = None
         _LOGGER.info("Snapshot Url: " + imageurl)
         try:
             if self.auth == "digest":
-                image = requests.get(imageurl, stream=True,auth=requests.auth.HTTPDigestAuth(self.user, self.password)).content
+                image = requests.get(imageurl, stream = True, auth = requests.auth.HTTPDigestAuth(self.user, self.password)).content
             else:
-                image = requests.get(imageurl, stream=True,auth=requests.auth.HTTPBasicAuth(self.user, self.password)).content
+                image = requests.get(imageurl, stream = True, auth = requests.auth.HTTPBasicAuth(self.user, self.password)).content
 
             if image is not None and len(image) > 0:
                 #construct image payload
                 #{{ \"message\": \"Motion Detected: {0}\", \"imagebase64\": \"{1}\" }}"
                 imgpayload = base64.encodestring(image)
-                msgpayload = json.dumps({"message":message,"imagebase64":imgpayload})
-                #msgpayload = "{{ \"message\": \"{0}\", \"imagebase64\": \"{1}\" }}".format(message,imgpayload)
+                msgpayload = json.dumps({"message":message, "imagebase64":imgpayload})
+                #msgpayload = "{{ \"message\": \"{0}\", \"imagebase64\": \"{1}\" }}".format(message, imgpayload)
 
-                self.client.publish(self.basetopic +"/{0}/Image".format(channelName),msgpayload)
+                self.client.publish(self.basetopic +"/{0}/Image".format(channelName), msgpayload)
         except Exception as ex:
             _LOGGER.error("Error sending image: " + str(ex))
             try:
@@ -214,7 +214,7 @@ class DahuaDevice():
                 with open("default.png", 'rb') as thefile:
                     imagepayload = thefile.read().encode("base64")
                 msgpayload = json.dumps({"message":"ERR:" + message, "imagebase64": imagepayload})
-                self.client.publish(self.basetopic +"/{0}/Image".format(channelName),msgpayload)
+                self.client.publish(self.basetopic +"/{0}/Image".format(channelName), msgpayload)
             except:
                 pass
 
@@ -231,7 +231,7 @@ class DahuaDevice():
     #on receive data from camera.
     def OnReceive(self, data):
         #self.client.loop_forever()
-        Data = data.decode("utf-8", errors="ignore")
+        Data = data.decode("utf-8", errors = "ignore")
         _LOGGER.debug("[{0}]: {1}".format(self.Name, Data))
 
         crossData = ""
@@ -240,17 +240,17 @@ class DahuaDevice():
             if Line == "HTTP/1.1 200 OK":
                 self.OnConnect()
 
-            if not Line.startswith("Code="):
+            if not Line.startswith("Code = "):
                 continue
             _LOGGER.info("Received: "+ Line)
 
             Alarm = dict()
             Alarm["name"] = self.Name
             for KeyValue in Line.split(';'):
-                Key, Value = KeyValue.split('=')
+                Key, Value = KeyValue.split(' = ')
                 Alarm[Key] = Value
 
-            index =  int( Alarm["index"]         )
+            index =  int(Alarm["index"]        )
             if index in self.channels:
                 Alarm["channel"] = self.channels[index]
             else:
@@ -258,27 +258,27 @@ class DahuaDevice():
 
             if Alarm["Code"] == "VideoMotion":
                 VideoMotionData = json.loads(Alarm["data"])
-                #RegionName = json.dumps ( VideoMotionData )
-                _LOGGER.info("Video Motion received: "+  Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"] + " RegionName " )
+                #RegionName = json.dumps (VideoMotionData)
+                _LOGGER.info("Video Motion received: "+  Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"] + " RegionName ")
                 _LOGGER.info("Region: " + RegionName)
                 if Alarm["action"] == "Start":
                     if not self.client.connected_flag:
                         self.client.reconnect()
-                    self.client.publish(self.basetopic +"/" + Alarm["Code"] + "/" + Alarm["channel"] ,"ON")
+                    self.client.publish(self.basetopic +"/" + Alarm["Code"] + "/" + Alarm["channel"], "ON")
                     #if self.alerts:
                         #possible new process:
-                        #process = threading.Thread(target=self.SnapshotImage,args=(index+self.snapshotoffset,Alarm["channel"],"Motion Detected: {0}".format(Alarm["channel"])))
+                        #process = threading.Thread(target = self.SnapshotImage, args = (index+self.snapshotoffset, Alarm["channel"], "Motion Detected: {0}".format(Alarm["channel"])))
                         #process.daemon = True                            # Daemonize thread
                         #process.start()
                 else:
-                    self.client.publish(self.basetopic +"/" + Alarm["Code"] + "/" + Alarm["channel"] ,"OFF")
+                    self.client.publish(self.basetopic +"/" + Alarm["Code"] + "/" + Alarm["channel"], "OFF")
                 elif Alarm["Code"] ==  "CrossRegionDetection" or Alarm["Code"] ==  "CrossLineDetection":
                 if Alarm["action"] == "Start":
                     regionText = Alarm["Code"]
                     try:
 
                         crossData = json.loads(Alarm["data"])
-                        _LOGGER.info(Alarm["Code"] + " received: " + Alarm["data"] )
+                        _LOGGER.info(Alarm["Code"] + " received: " + Alarm["data"])
                         if "Direction" not in crossData:
                             direction = "unknown"
                         else:
@@ -286,19 +286,19 @@ class DahuaDevice():
 
                         region = crossData["Name"]
                         object = crossData["Object"]["ObjectType"]
-                        regionText = "{} With {} in {} direction for {} region".format(Alarm["Code"],object,direction,region)
+                        regionText = "{} With {} in {} direction for {} region".format(Alarm["Code"], object, direction, region)
                     except Exception as ivsExcept:
                         _LOGGER.error("Error getting IVS data: " + str(ivsExcept))
 
-                    self.client.publish(self.basetopic +"/IVS/" + Alarm["channel"] ,regionText)
+                    self.client.publish(self.basetopic +"/IVS/" + Alarm["channel"], regionText)
                     #if self.alerts:
                             #possible new process:
-                            #process = threading.Thread(target=self.SnapshotImage,args=(index+self.snapshotoffset,Alarm["channel"],"IVS: {0}: {1}".format(Alarm["channel"],regionText)))
+                            #process = threading.Thread(target = self.SnapshotImage, args = (index+self.snapshotoffset, Alarm["channel"], "IVS: {0}: {1}".format(Alarm["channel"], regionText)))
                             #process.daemon = True                            # Daemonize thread
                             #process.start()
             else:
                 _LOGGER.info("dahua_event_received: "+  Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"])
-                self.client.publish(self.basetopic +"/" + Alarm["channel"] + "/" + Alarm["name"],Alarm["Code"])
+                self.client.publish(self.basetopic +"/" + Alarm["channel"] + "/" + Alarm["name"], Alarm["Code"])
 
 class DahuaEventThread(threading.Thread):
     """Connects to device and subscribes to events"""
@@ -314,20 +314,20 @@ class DahuaEventThread(threading.Thread):
 
         self.basetopic = mqtt["basetopic"]
 
-        self.client = paho.Client("CameraEvents-" + socket.gethostname(), clean_session=True)
+        self.client = paho.Client("CameraEvents-" + socket.gethostname(), clean_session = True)
         self.client.on_connect = self.mqtt_on_connect
         self.client.on_disconnect = self.mqtt_on_disconnect
-        self.client.message_callback_add(self.basetopic +"/+/picture",self.mqtt_on_picture_message)
-        self.client.message_callback_add(self.basetopic +"/+/alerts",self.mqtt_on_alert_message)
+        self.client.message_callback_add(self.basetopic +"/+/picture", self.mqtt_on_picture_message)
+        self.client.message_callback_add(self.basetopic +"/+/alerts", self.mqtt_on_alert_message)
 
-        self.client.will_set(self.basetopic +"/$online",False,qos=0,retain=True)
+        self.client.will_set(self.basetopic +"/$online", False, qos = 0, retain = True)
 
 
         self.alerts = True
 
         for device_cfg in cameras:
 
-            device = DahuaDevice(device_cfg.get("name"), device_cfg, self.client,self.basetopic)
+            device = DahuaDevice(device_cfg.get("name"), device_cfg, self.client, self.basetopic)
             self.Devices.append(device)
 
             CurlObj = pycurl.Curl()
@@ -348,7 +348,7 @@ class DahuaEventThread(threading.Thread):
             CurlObj.setopt(pycurl.WRITEFUNCTION, device.OnReceive)
 
             self.CurlMultiObj.add_handle(CurlObj)
-            self.NumCurlObjs += 1
+            self.NumCurlObjs + = 1
 
             _LOGGER.debug("Added Dahua device at: %s", device.url)
 
@@ -381,7 +381,7 @@ class DahuaEventThread(threading.Thread):
                 _LOGGER.debug("Heartbeat: " + str(datetime.datetime.now()))
                 if not self.client.connected_flag:
                     self.client.reconnect()
-                self.client.publish(self.basetopic +"/$heartbeat",str(datetime.datetime.now()))
+                self.client.publish(self.basetopic +"/$heartbeat", str(datetime.datetime.now()))
 
             Ret, NumHandles = self.CurlMultiObj.perform()
 
@@ -413,11 +413,11 @@ class DahuaEventThread(threading.Thread):
             #if Ret != pycurl.E_CALL_MULTI_PERFORM: break
 
     def mqtt_on_connect(self, client, userdata, flags, rc):
-        if rc==0:
-            _LOGGER.info("Connected to MQTT OK Returned code={0}".format(rc))
-            self.client.connected_flag=True
-            self.client.publish(self.basetopic +"/$online",True,qos=0,retain=True)
-            self.client.publish(self.basetopic +"/$version",version)
+        if rc == 0:
+            _LOGGER.info("Connected to MQTT OK Returned code = {0}".format(rc))
+            self.client.connected_flag = True
+            self.client.publish(self.basetopic +"/$online", True, qos = 0, retain = True)
+            self.client.publish(self.basetopic +"/$version", version)
             if self.alerts:
                 state = "ON"
             else:
@@ -425,92 +425,92 @@ class DahuaEventThread(threading.Thread):
 
             for device in self.Devices:
                 device.alerts = state
-                self.client.publish(self.basetopic +"/" + device.Name + "/alerts/state",state)
+                self.client.publish(self.basetopic +"/" + device.Name + "/alerts/state", state)
             #self.client.subscribe(self.basetopic +"/#")
             #self.client.subscribe("CameraEventsPy/alerts")
 
         else:
-            _LOGGER.info("Camera : {0}: Bad mqtt connection Returned code={1}".format("self.Name",rc) )
-            self.client.connected_flag=False
+            _LOGGER.info("Camera : {0}: Bad mqtt connection Returned code = {1}".format("self.Name", rc))
+            self.client.connected_flag = False
 
     def mqtt_on_disconnect(self, client, userdata, rc):
         logging.info("disconnecting reason  "  +str(rc))
-        self.client.connected_flag=False
+        self.client.connected_flag = False
 
 
-    def mqtt_on_picture_message(self,client, userdata, msg):
+    def mqtt_on_picture_message(self, client, userdata, msg):
 
         #if msg.payload.decode() == "Hello world!":
-        _LOGGER.info("Picture Msg Received: Topic:{0} Payload:{1}".format(msg.topic,msg.payload))
+        _LOGGER.info("Picture Msg Received: Topic:{0} Payload:{1}".format(msg.topic, msg.payload))
         msgchannel = msg.topic.split("/")[1]
         for device in self.Devices:
             channel = device.channelIsMine(msgchannel)
             if channel > -1:
-                _LOGGER.debug("Found Camera: {0} channel: {1}: Name:{2}".format(device.Name,channel,device.channels[channel]))
-                #device.SnapshotImage(channel+device.snapshotoffset,msgchannel,"Snap Shot Image")
+                _LOGGER.debug("Found Camera: {0} channel: {1}: Name:{2}".format(device.Name, channel, device.channels[channel]))
+                #device.SnapshotImage(channel+device.snapshotoffset, msgchannel, "Snap Shot Image")
                 break
 
 
-    def mqtt_on_alert_message(self,client, userdata, msg):
+    def mqtt_on_alert_message(self, client, userdata, msg):
         if msg.payload == 'ON':
             newState = True
         else:
             newState = False
 
         deviceName = msg.topic.split('/')[1]
-        _LOGGER.info("Camera: {0}: Msg Received: Topic:{1} Payload:{2}".format(deviceName,msg.topic,msg.payload))
+        _LOGGER.info("Camera: {0}: Msg Received: Topic:{1} Payload:{2}".format(deviceName, msg.topic, msg.payload))
         for device in self.Devices:
             #channel = self.Devices[device].channelIsMine("Garage")
             if device.Name == deviceName:
                 device.alerts = newState
-                _LOGGER.info("Turning Alerts {0}".format( newState))
-                self.client.publish(self.basetopic +"/" + device.Name + "/alerts/state",msg.payload)
+                _LOGGER.info("Turning Alerts {0}".format(newState))
+                self.client.publish(self.basetopic +"/" + device.Name + "/alerts/state", msg.payload)
 
-    def mqtt_on_cross_message(self,client, userdata, msg):
+    def mqtt_on_cross_message(self, client, userdata, msg):
         if msg.payload == 'ON':
             newState = True
         else:
             newState = False
 
         deviceName = msg.topic.split('/')[1]
-        _LOGGER.info("Camera: {0}: Msg Received: Topic:{1} Payload:{2}".format(deviceName,msg.topic,msg.payload))
+        _LOGGER.info("Camera: {0}: Msg Received: Topic:{1} Payload:{2}".format(deviceName, msg.topic, msg.payload))
         for device in self.Devices:
             #channel = self.Devices[device].channelIsMine("Garage")
             if device.Name == deviceName:
                 device.alerts = newState
-                _LOGGER.info("Turning Alerts {0}".format( newState))
-                self.client.publish(self.basetopic +"/" + device.Name + "/alerts/state",msg.payload)
+                _LOGGER.info("Turning Alerts {0}".format(newState))
+                self.client.publish(self.basetopic +"/" + device.Name + "/alerts/state", msg.payload)
 
 if __name__ == '__main__':
 
     cameras = []
     cp = ConfigParser()
     _LOGGER.info("Loading config")
-    filename = {"config.ini","conf/config.ini"}
+    filename = {"config.ini", "conf/config.ini"}
     dataset = cp.read(filename)
 
     try:
         if len(dataset) != 1:
-            raise ValueError( "Failed to open/find all files")
-        camera_items = cp.items( "Cameras" )
+            raise ValueError("Failed to open/find all files")
+        camera_items = cp.items("Cameras")
         for key, camera_key in camera_items:
             #do something with path
             camera_cp = cp.items(camera_key)
             camera = {}
-            #temp = cp.get(camera_key,"host")
-            camera["host"] = cp.get(camera_key,'host')
-            camera["protocol"] = cp.get(camera_key,'protocol')
-            camera["isNVR"] = cp.get(camera_key,'isNVR')
-            camera["name"] = cp.get(camera_key,'name')
-            camera["port"] = cp.getint(camera_key,'port')
-            camera["user"] = cp.get(camera_key,'user')
-            camera["pass"] = cp.get(camera_key,'pass')
-            camera["auth"] = cp.get(camera_key,'auth')
-            camera["events"] = cp.get(camera_key,'events')
+            #temp = cp.get(camera_key, "host")
+            camera["host"] = cp.get(camera_key, 'host')
+            camera["protocol"] = cp.get(camera_key, 'protocol')
+            camera["isNVR"] = cp.get(camera_key, 'isNVR')
+            camera["name"] = cp.get(camera_key, 'name')
+            camera["port"] = cp.getint(camera_key, 'port')
+            camera["user"] = cp.get(camera_key, 'user')
+            camera["pass"] = cp.get(camera_key, 'pass')
+            camera["auth"] = cp.get(camera_key, 'auth')
+            camera["events"] = cp.get(camera_key, 'events')
             channels = {}
-            if cp.has_option(camera_key,'channels'):
+            if cp.has_option(camera_key, 'channels'):
                 try:
-                    channellist = cp.get(camera_key,'channels').split('|')
+                    channellist = cp.get(camera_key, 'channels').split('|')
                     for channel in channellist:
                         channelIndex = channel.split(':')[0]
                         channelName = channel.split(':')[1]
@@ -521,18 +521,18 @@ if __name__ == '__main__':
                     channels = {}
 
             # added new snapshot offset section.
-            if cp.has_option(camera_key,'snapshotoffset'):
-                camera["snapshotoffset"] = cp.getint(camera_key,'snapshotoffset')
+            if cp.has_option(camera_key, 'snapshotoffset'):
+                camera["snapshotoffset"] = cp.getint(camera_key, 'snapshotoffset')
             else:
                 camera["snapshotoffset"] = 0
             camera["channels"] = channels
             cameras.append(camera)
 
         mqtt = {}
-        mqtt["IP"] = cp.get("MQTT Broker","IP")
-        mqtt["port"] = cp.get("MQTT Broker","port")
-        mqtt["basetopic"] = cp.get("MQTT Broker","BaseTopic")
-        dahua_event = DahuaEventThread(mqtt,cameras)
+        mqtt["IP"] = cp.get("MQTT Broker", "IP")
+        mqtt["port"] = cp.get("MQTT Broker", "port")
+        mqtt["basetopic"] = cp.get("MQTT Broker", "BaseTopic")
+        dahua_event = DahuaEventThread(mqtt, cameras)
 
         dahua_event.start()
     except Exception as ex:
