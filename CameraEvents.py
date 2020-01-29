@@ -214,7 +214,7 @@ class DahuaDevice():
                 self.OnConnect()
 
             if not Line.startswith("Code="):
-                 continue
+                continue
             _LOGGER.info("Received: "+ Line)
             
             Alarm = dict()
@@ -507,8 +507,3 @@ if __name__ == '__main__':
         dahua_event.start()
     except Exception as ex:
         _LOGGER.error("Error starting:" + str(ex))
-
-    
-
-    
-
