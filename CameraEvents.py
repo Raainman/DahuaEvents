@@ -1,8 +1,35 @@
 """
-Attach event listener to Dahua devices
-Borrowed code from https://github.com/johnnyletrois/dahua-watch
-And https://github.com/SaWey/home-assistant-dahua-event
-Author: PsycikNZ
+Connect Dahua events to mqtt (and vice versa)
+
+Borrowed code from 
+	https://github.com/psyciknz/CameraEvents, 
+	https://github.com/johnnyletrois/dahua-watch
+	https://github.com/SaWey/home-assistant-dahua-event
+Author: Raainman
+
+Changes so far:
+Base version is from CameraEvents
+Changed the base version to python:3.8-slim-buster (Debian) because I could not even perfom nano when I logged into the docker sh
+Removed all the image processing (snapshots), because I got errors that base64 encoding should not be done in json. Have to figure out how to resolve this.
+
+ToDo:
+Change json message for VideoMotion message, include the RegionName.
+	VideoMotion;action=Start;index=0;data={
+	   "Id" : [ 0 ],
+	   "RegionName" : [ "Oprit" ],
+	   "SmartMotionEnable" : true
+	}
+	VideoMotion;action=Stop;index=0;data={
+	  "Id" : [ 0 ],
+	   "RegionName" : [ "Oprit" ],
+	   "SmartMotionEnable" : true
+	}
+Change CameraEvents --> DahuaEvents
+Find out how to send images 
+Also define mqtt messages to update the camera (perform PTZ for instance)
+Split up the code 
+...
+
 """
 
 
