@@ -66,8 +66,8 @@ class DahuaDevice():
     #EVENT_TEMPLATE = "{protocol}://{host}:{port}/cgi-bin/eventManager.cgi?action=attach&channel=0&codes=%5B{events}%5D"
     EVENT_TEMPLATE = "{protocol}://{host}:{port}/cgi-bin/eventManager.cgi?action=attach&codes=%5B{events}%5D"
     CHANNEL_TEMPLATE = "{protocol}://{host}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=ChannelTitle"
-    #SNAPSHOT_TEMPLATE = "{protocol}://{host}:{port}/cgi-bin/snapshot.cgi?channel={channel}"
-	SNAPSHOT_TEMPLATE = "{protocol}://{host}:{port}/cgi-bin/snapshot.cgi?1"
+    SNAPSHOT_TEMPLATE = "{protocol}://{host}:{port}/cgi-bin/snapshot.cgi?channel={channel}"
+	#SNAPSHOT_TEMPLATE = "{protocol}://{host}:{port}/cgi-bin/snapshot.cgi?1"
     #SNAPSHOT_TEMPLATE = "{protocol}://{host}:{port}/cgi-bin/snapshot.cgi?chn={channel}"
     SNAPSHOT_EVENT = "{protocol}://{host}:{port}/cgi-bin/eventManager.cgi?action=attachFileProc&Flags[0]=Event&Events=%5B{events}%5D"
     #cgi-bin/snapManager.cgi?action=attachFileProc&Flags[0]=Event&Events=[VideoMotion%2CVideoLoss]    
@@ -157,26 +157,6 @@ class DahuaDevice():
 
         return -1
 
-    #def ChannelList(self,channel):
-	#	query_args = {"method":"configManager.getConfig",
-	# 		"params": {
-	# 			"name":"ChannelTitle"
-	# 		},
-	# 		"session":self.SessionID,
-	# 		"id":1}
-    #
-	# 	print "[>] Get ChannelList:"
-    #     url = '{}://{}:{}{}'.format(self.protocol, self.host, self.port, '/RPC2')
-    #     response = requests.put(url,auth=requests.auth.HTTPDigestAuth(self.user,self.password),data=json.dumps(query_args))
-
-	# 	result = json.load(response.content)
-	# 	if not result['result']:
-	# 		print "Resp: ",result
-	# 		print "Error CMD: {}".format(self.string_request)
-	# 		return
-	# 	print result
-    
-
     def SnapshotImage(self, channel, channelName, message):
         imageurl  = self.SNAPSHOT_TEMPLATE.format(
                 host=self.host,
@@ -191,7 +171,6 @@ class DahuaDevice():
                 image = requests.get(imageurl, stream=True,auth=requests.auth.HTTPDigestAuth(self.user, self.password)).content
             else:
                 image = requests.get(imageurl, stream=True,auth=requests.auth.HTTPBasicAuth(self.user, self.password)).content
-        
         
             if image is not None and len(image) > 0:
                 #construct image payload
@@ -211,7 +190,6 @@ class DahuaDevice():
                 self.client.publish(self.basetopic +"/{0}/Image".format(channelName),msgpayload)
             except:
                 pass
-
 
     # Connected to camera
     def OnConnect(self):
@@ -237,6 +215,7 @@ class DahuaDevice():
 
             if not Line.startswith("Code="):
                  continue
+            _LOGGER.info("Received: "+ Line)
             
             Alarm = dict()
             Alarm["name"] = self.Name
@@ -250,7 +229,6 @@ class DahuaDevice():
             else:
                 Alarm["channel"] = self.Name + ":" + str(index)
 
-            #mqttc.connect(self.mqtt["IP"], int(self.mqtt["port"]), 60)
             if Alarm["Code"] == "VideoMotion":
                 _LOGGER.info("Video Motion received: "+  Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"])
                 if Alarm["action"] == "Start":
@@ -291,17 +269,6 @@ class DahuaDevice():
             else:
                 _LOGGER.info("dahua_event_received: "+  Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"])
                 self.client.publish(self.basetopic +"/" + Alarm["channel"] + "/" + Alarm["name"],Alarm["Code"])
-            #2019-01-27 08:28:19,658 - __main__ - INFO - dahua_event_received: NVR Index: NVR:0 Code: CrossRegionDetection
-            #2019-01-27 08:28:19,674 - __main__ - INFO - dahua_event_received: NVR Index: NVR:0 Code: CrossRegionDetection
-            #2019-01-27 08:28:19,703 - __main__ - INFO - dahua_event_received: NVR Index: NVR:0 Code: CrossLineDetection
-            #2019-01-27 08:28:19,729 - __main__ - INFO - dahua_event_received: NVR Index: NVR:0 Code: CrossRegionDetection
-            #2019-01-27 08:28:19,743 - __main__ - INFO - dahua_event_received: NVR Index: NVR:0 Code: CrossLineDetection
-            #mqttc.disconnect()
-            #self.hass.bus.fire("dahua_event_received", Alarm)
-
-    
-
-
 
 class DahuaEventThread(threading.Thread):
     """Connects to device and subscribes to events"""
