@@ -258,19 +258,20 @@ class DahuaDevice():
 
             if Alarm["Code"] == "VideoMotion":
                 VideoMotionData = json.loads(Alarm["data"])
+                #Can there be more than one Region ??
                 RegionName = ', '.join(VideoMotionData["RegionName"])
                 _LOGGER.info("Video Motion received: "+  Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"] + " RegionName: " + RegionName)
                 if Alarm["action"] == "Start":
                     if not self.client.connected_flag:
                         self.client.reconnect()
-                    self.client.publish(self.basetopic +"/" + Alarm["Code"] + "/" + Alarm["channel"], "ON")
+                    self.client.publish(self.basetopic +"/" + Alarm["Code"] + "/" + Alarm["channel"] + "/" + RegionName, "ON")
                     #if self.alerts:
                         #possible new process:
                         #process = threading.Thread(target = self.SnapshotImage, args = (index+self.snapshotoffset, Alarm["channel"], "Motion Detected: {0}".format(Alarm["channel"])))
                         #process.daemon = True                            # Daemonize thread
                         #process.start()
                 else:
-                    self.client.publish(self.basetopic +"/" + Alarm["Code"] + "/" + Alarm["channel"], "OFF")
+                    self.client.publish(self.basetopic +"/" + Alarm["Code"] + "/" + Alarm["channel"] + "/" + RegionName, "OFF")
             elif Alarm["Code"] ==  "CrossRegionDetection" or Alarm["Code"] == "CrossLineDetection":
                 if Alarm["action"] == "Start":
                     regionText = Alarm["Code"]
