@@ -258,7 +258,7 @@ class DahuaDevice():
 
             if Alarm["Code"] == "VideoMotion":
                 VideoMotionData = json.loads(Alarm["data"])
-				RegionName=json.dumps(VideoMotionData)
+				RegionName = json.dumps(VideoMotionData)
 				
                 _LOGGER.info("Video Motion received: "+  Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"] + " RegionName " )
 				_LOGGER.info("Region: " + RegionName)
