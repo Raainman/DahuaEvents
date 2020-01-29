@@ -292,7 +292,7 @@ class DahuaDevice():
                     except Exception as ivsExcept:
                         _LOGGER.error("Error getting IVS data: " + str(ivsExcept))
                     payload = { 'Code':Alarm["Code"],'Direction':direction,'Region':region }
-                    _LOGGER.info("Payload:"+payload)
+                    #_LOGGER.info("Payload:"+payload)
                     self.client.publish(self.basetopic +"/IVS/" + Alarm["channel"],payload=json.dumps(payload))
                     #self.client.publish(self.basetopic +"/IVS/" + Alarm["channel"], regionText)
                     #if self.alerts:
