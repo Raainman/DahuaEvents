@@ -348,7 +348,7 @@ class DahuaEventThread(threading.Thread):
             CurlObj.setopt(pycurl.WRITEFUNCTION, device.OnReceive)
 
             self.CurlMultiObj.add_handle(CurlObj)
-            self.NumCurlObjs + = 1
+            self.NumCurlObjs += 1
 
             _LOGGER.debug("Added Dahua device at: %s", device.url)
 
