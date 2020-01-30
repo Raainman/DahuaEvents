@@ -16,8 +16,6 @@ WORKDIR /opt/cameraevents
 
 RUN groupadd -r cameraevents && useradd -r -g cameraevents cameraevents
 RUN chown -R cameraevents /opt/cameraevents
-# Add to sudo
-RUN useradd -m cameraevents && echo "docker:docker" | chpasswd && adduser cameraevents sudo
 
 USER cameraevents
 
