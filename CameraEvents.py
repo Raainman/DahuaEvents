@@ -267,20 +267,14 @@ class DahuaDevice():
                     if not self.client.connected_flag:
                         self.client.reconnect()
                     self.client.publish(self.basetopic +"/" + Alarm["Code"] + "/" + Alarm["channel"] + "/" + RegionName, "ON")
-                    #if self.alerts:
-                        #possible new process:
-                        #process = threading.Thread(target = self.SnapshotImage, args = (index+self.snapshotoffset, Alarm["channel"], "Motion Detected: {0}".format(Alarm["channel"])))
-                        #process.daemon = True                            # Daemonize thread
-                        #process.start()
                 else:
                     self.client.publish(self.basetopic +"/" + Alarm["Code"] + "/" + Alarm["channel"] + "/" + RegionName, "OFF")
             elif Alarm["Code"] ==  "CrossRegionDetection" or Alarm["Code"] == "CrossLineDetection":
-                if Alarm["action"] == "Start":
+                if Alarm["action"] == "Start" or Alarm["action"] == "Stop" :
                     regionText = Alarm["Code"]
                     try:
-
-                        crossData = json.loads(Alarm["data"])
                         _LOGGER.info(Alarm["Code"] + " received: " + Alarm["data"])
+                        crossData = json.loads(Alarm["data"])
                         if "Direction" not in crossData:
                             direction = "unknown"
                         else:
@@ -291,15 +285,9 @@ class DahuaDevice():
                         regionText = "{} With {} in {} direction for {} region".format(Alarm["Code"], object, direction, region)
                     except Exception as ivsExcept:
                         _LOGGER.error("Error getting IVS data: " + str(ivsExcept))
-                    payload = { 'Code':Alarm["Code"],'Direction':direction,'Region':region,'ObjectType':object }
+                    payload = { 'Code':Alarm["Code"],'Direction':direction,'Region':region,'ObjectType':object,'Action':Alarm["action"] }
                     #_LOGGER.info("Payload:"+payload)
                     self.client.publish(self.basetopic +"/IVS/" + Alarm["channel"],payload=json.dumps(payload))
-                    #self.client.publish(self.basetopic +"/IVS/" + Alarm["channel"], regionText)
-                    #if self.alerts:
-                            #possible new process:
-                            #process = threading.Thread(target = self.SnapshotImage, args = (index+self.snapshotoffset, Alarm["channel"], "IVS: {0}: {1}".format(Alarm["channel"], regionText)))
-                            #process.daemon = True                            # Daemonize thread
-                            #process.start()
             else:
                 _LOGGER.info("dahua_event_received: "+  Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"])
                 self.client.publish(self.basetopic +"/" + Alarm["channel"] + "/" + Alarm["name"], Alarm["Code"])
@@ -321,11 +309,10 @@ class DahuaEventThread(threading.Thread):
         self.client = paho.Client("CameraEvents-" + socket.gethostname(), clean_session = True)
         self.client.on_connect = self.mqtt_on_connect
         self.client.on_disconnect = self.mqtt_on_disconnect
-        self.client.message_callback_add(self.basetopic +"/+/picture", self.mqtt_on_picture_message)
-        self.client.message_callback_add(self.basetopic +"/+/alerts", self.mqtt_on_alert_message)
+        self.client.message_callback_add(self.basetopic +"/picture", self.mqtt_on_picture_message)
+        self.client.message_callback_add(self.basetopic +"/alerts", self.mqtt_on_alert_message)
 
         self.client.will_set(self.basetopic +"/$online", False, qos = 0, retain = True)
-
 
         self.alerts = True
 
