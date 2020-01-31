@@ -3,24 +3,20 @@ This is a branch of CameraEvents repo, because the snapshot url's there are wron
 
 Docker/Python service for attaching to Dahua camera events api.  Posts messages to mqtt upon events.
 
-Can post an image into the mqtt payload also (which https://github.com/jpmens/mqttwarn can post to slack and pushover).
 
 # Running
 
-I build and run in docker mostly.  It's built on a amd64 linux machine but I create images for arm32v7 and arm64v8.  Which is why there is a Dockerfile.cross instead of just a regular docker file.  
+I build and run in docker mostly, and run on x86. 
 
 Copy the sample config.master.ini to config.ini
 
 Run command:
 ```
-docker run -v <config path>:/opt/cameraevents/conf psyciknz/cameraevents
+docker run -v <config path>:/opt/cameraevents/conf raainman/dahuaevents
 ```
 Config path is the path where the config.ini file will exist.
 
 Otherwise, clone into a directory, create the config file, and run with python CameraEvents.py
-
-The Dockerfile.cross is what I use for cross architecture builds.  So it is not directly buildable as it needs some modifications to remove the qemu emulation for building an arm32 image on an amd.  The instructions for building are a little hard to describe here.
-
 
 
 # Configuration.
@@ -86,7 +82,7 @@ Which is the last will and testament that can show you the service is alive.
 
 An alert message will be posted to the topic as follows:
 ```
-CameraEvents/<code>/<channel> 
+CameraEvents/<code>/<channel>/<Rule>
 ```
 Where code is VideoMotion (as per the config events).  Channel, will either be the channel name or the channel number.
 The payload will be ON/OFF for using as a motion detector.
@@ -98,19 +94,12 @@ CameraEvents/NVR:3/Image {"message": "Motion Detected: NVR:3", "imagebase64": "<
 CameraEvents/VideoMotion/NVR:3 OFF
 ```
 
-IVS Messages are a bit more message like.
+IVS Messages send a larger message with more info.
 eg
 ```
-CameraEvents/IVS/Garage CrossLineDetection With Human in RightToLeft direction for Gate region
+CameraEvents/IVS/<Todo>
 ```
 I'll add specifics later for IVS, as I've seen the "human" be vehicle and smoke also...I'll problably add a fitler for these.
 # Problems/Change History
 
-2019-02-02 
-- Found Solution to snapshot problem, but new firmware (for me) is index+1 - this isn't currently configurable.
-  - Added IVS topic.
-  - Added travis testing.
-
-2019-01-15 
-- As per some new firmware, the snapshot image command has stopped working, and the channel list.  I'm attempting to find a work around.
 
