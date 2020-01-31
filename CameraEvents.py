@@ -291,8 +291,9 @@ class DahuaDevice():
                         _LOGGER.info(Alarm["Code"] + " received: " + Alarm["data"])
                         crossData = json.loads(Alarm["data"])
                         #Feature" : [ "Neutral", "NoGlasses" ],,
-                        feature = ', '.join(crossData["Object"]["Feature"])
                         object = crossData["Object"]["ObjectType"]
+                        feature = ''
+                        #', '.join(crossData["Object"]["Feature"])
                     except Exception as ivsExcept:
                         _LOGGER.error("Error getting IVS data: " + str(ivsExcept))
                     payload = { 'Code':Alarm["Code"],'ObjectType':object,'Feature':feature,'Action':Alarm["action"] }
