@@ -285,7 +285,7 @@ class DahuaDevice():
                         _LOGGER.error("Error getting IVS data: " + str(ivsExcept))
                     payload = { 'Code':Alarm["Code"],'Direction':direction,'Region':region,'ObjectType':object,'Action':Alarm["action"] }
                     self.client.publish(self.basetopic +"/IVS/" + Alarm["channel"],payload=json.dumps(payload))
-            elif Alarm["Code"] == "FaceDetection"
+            elif Alarm["Code"] == "FaceDetection":
                 if Alarm["action"] == "Start" or Alarm["action"] == "Stop" :
                     try:
                         _LOGGER.info(Alarm["Code"] + " received: " + Alarm["data"])
