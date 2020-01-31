@@ -271,7 +271,6 @@ class DahuaDevice():
                     self.client.publish(self.basetopic +"/" + Alarm["Code"] + "/" + Alarm["channel"] + "/" + RegionName, "OFF")
             elif Alarm["Code"] ==  "CrossRegionDetection" or Alarm["Code"] == "CrossLineDetection":
                 if Alarm["action"] == "Start" or Alarm["action"] == "Stop" :
-                    regionText = Alarm["Code"]
                     try:
                         _LOGGER.info(Alarm["Code"] + " received: " + Alarm["data"])
                         crossData = json.loads(Alarm["data"])
@@ -282,12 +281,22 @@ class DahuaDevice():
 
                         region = crossData["Name"]
                         object = crossData["Object"]["ObjectType"]
-                        regionText = "{} With {} in {} direction for {} region".format(Alarm["Code"], object, direction, region)
                     except Exception as ivsExcept:
                         _LOGGER.error("Error getting IVS data: " + str(ivsExcept))
                     payload = { 'Code':Alarm["Code"],'Direction':direction,'Region':region,'ObjectType':object,'Action':Alarm["action"] }
-                    #_LOGGER.info("Payload:"+payload)
                     self.client.publish(self.basetopic +"/IVS/" + Alarm["channel"],payload=json.dumps(payload))
+            elif Alarm["Code"] == "FaceDetection"
+                if Alarm["action"] == "Start" or Alarm["action"] == "Stop" :
+                    try:
+                        _LOGGER.info(Alarm["Code"] + " received: " + Alarm["data"])
+                        crossData = json.loads(Alarm["data"])
+                        #Feature" : [ "Neutral", "NoGlasses" ],,
+                        feature = ', '.join(crossData["Object"]["Feature"])
+                        object = crossData["Object"]["ObjectType"]
+                    except Exception as ivsExcept:
+                        _LOGGER.error("Error getting IVS data: " + str(ivsExcept))
+                    payload = { 'Code':Alarm["Code"],'ObjectType':object,'Feature':feature,'Action':Alarm["action"] }
+                    self.client.publish(self.basetopic +"/IVS/FaceDetection/" + Alarm["channel"],payload=json.dumps(payload))
             else:
                 _LOGGER.info("dahua_event_received: "+  Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"])
                 self.client.publish(self.basetopic +"/" + Alarm["channel"] + "/" + Alarm["name"], Alarm["Code"])
