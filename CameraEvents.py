@@ -297,6 +297,7 @@ class DahuaDevice():
                     self.client.publish(self.basetopic +"/IVS/FaceDetection/" + Alarm["channel"],payload=json.dumps(payload))
             else:
                 _LOGGER.info("dahua_event_received: "+  Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"])
+                _LOGGER.info("dahua_event_received Line: "+ Line)
                 self.client.publish(self.basetopic +"/" + Alarm["channel"] + "/" + Alarm["name"], Alarm["Code"])
 
 class DahuaEventThread(threading.Thread):
