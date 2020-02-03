@@ -262,7 +262,7 @@ class DahuaDevice():
                 VideoMotionData = json.loads(Alarm["data"])
                 #Can there be more than one Region ??
                 RegionName = ', '.join(VideoMotionData["RegionName"])
-                _LOGGER.info("Video Motion received: "+  Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"] + " RegionName: " + RegionName)
+                _LOGGER.info("Video Motion received: "+ Alarm["action"] + Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"] + " RegionName: " + RegionName)
                 if Alarm["action"] == "Start":
                     if not self.client.connected_flag:
                         self.client.reconnect()
@@ -272,7 +272,7 @@ class DahuaDevice():
             elif Alarm["Code"] ==  "CrossRegionDetection" or Alarm["Code"] == "CrossLineDetection":
                 if Alarm["action"] == "Start" or Alarm["action"] == "Stop" :
                     try:
-                        _LOGGER.info(Alarm["Code"] + " received: " + Alarm["data"])
+                        _LOGGER.info(Alarm["Code"] + Alarm["action"] + " received: " + Alarm["data"])
                         crossData = json.loads(Alarm["data"])
                         if "Direction" not in crossData:
                             direction = "unknown"
@@ -288,15 +288,12 @@ class DahuaDevice():
             elif Alarm["Code"] == "FaceDetection":
                 if Alarm["action"] == "Start" or Alarm["action"] == "Stop" :
                     try:
-                        _LOGGER.info(Alarm["Code"] + " received: " + Alarm["data"])
+                        _LOGGER.info(Alarm["Code"] + " " + Alarm["action"] + " received: " + Alarm["data"])
                         crossData = json.loads(Alarm["data"])
-                        #Feature" : [ "Neutral", "NoGlasses" ],,
                         object = crossData["Object"]["ObjectType"]
-                        feature = ''
-                        #', '.join(crossData["Object"]["Feature"])
                     except Exception as ivsExcept:
                         _LOGGER.error("Error getting IVS data: " + str(ivsExcept))
-                    payload = { 'Code':Alarm["Code"],'ObjectType':object,'Feature':feature,'Action':Alarm["action"] }
+                    payload = { 'Code':Alarm["Code"],'ObjectType':object,'Action':Alarm["action"] }
                     self.client.publish(self.basetopic +"/IVS/FaceDetection/" + Alarm["channel"],payload=json.dumps(payload))
             else:
                 _LOGGER.info("dahua_event_received: "+  Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"])
