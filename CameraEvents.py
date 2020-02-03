@@ -234,7 +234,7 @@ class DahuaDevice():
     def OnReceive(self, data):
         #self.client.loop_forever()
         Data = data.decode("utf-8", errors = "ignore")
-        _LOGGER.debug("[{0}]: {1}".format(self.Name, Data))
+        #_LOGGER.debug("[{0}]: {1}".format(self.Name, Data))
 
         crossData = ""
 
@@ -244,7 +244,7 @@ class DahuaDevice():
 
             if not Line.startswith("Code="):
                 continue
-            _LOGGER.info("Received: "+ Line)
+            #_LOGGER.info("Received: "+ Line)
 
             Alarm = dict()
             Alarm["name"] = self.Name
