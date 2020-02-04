@@ -3,7 +3,7 @@ This is a branch of CameraEvents repo, because the snapshot url's there are wron
 
 Docker/Python service for attaching to Dahua camera events api.  Posts messages to mqtt upon events.
 
-My personal setup is to connect DahuaEvents via MQTT to Domoticz (Home automation).
+My personal setup is to connect DahuaEvents via MQTT / NodeRed to Domoticz (Home automation).
 
 if you have any questions or remarks drop me a mail at raainman.github@gmail.com
 
