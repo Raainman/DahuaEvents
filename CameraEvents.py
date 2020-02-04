@@ -305,7 +305,7 @@ class DahuaDevice():
                         filesize = fileData["Size"]
                         storagepoint = fileData["StoragePoint"]
                         #Try to find [A-Z] in filename, this has some meaning like M=Motion, R=Record, F=???
-                        if re.search("\[[A-Z]]\",file):
+                        if re.search("\[[A-Z]\]",file):
                             filecode = re.findall("[A-Z]",re.findall("\[[A-Z]\]",file)[0])[0]
                         else:
                             filecode = '?'
