@@ -5,7 +5,7 @@ Docker/Python service for attaching to Dahua camera events api.  Posts messages 
 
 My personal setup is to connect DahuaEvents via MQTT to Domoticz (Home automation).
 
-if you have any questions or remarks drop me a mail at raainman.github(AT)gmail.com
+if you have any questions or remarks drop me a mail at raainman.github@gmail.com
 
 
 # Running
