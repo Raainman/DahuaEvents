@@ -104,14 +104,14 @@ I'll add specifics later for IVS, as I've seen the "human" be vehicle and smoke 
 # NewFile
 
 Currently adding a message for all the files that are broadcasted by the camera. Subscribe to the event 'NewFile' in the config file, any dav, or snapshot by the camera will be posted on this event. 
-
+```
 <maintopic>/NewFile/<channel>/{ 'Code':NewFile,'File':"/mnt/sd/2020-02-03/001/dav/16/16.07.20-16.07.50[M][0@0][0].jpg",'Extension':'jpg','Size':6656491 }
-
+```
 This file can be downloaded bij calling RPC_Loadfile like this;
 
 192.168.1.108/cgi-bin/RPC_Loadfile/mnt/sd/2020-02-03/001/jpg/16/07/20[M][0@0][0].jpg
 
-Note: Work in progress ... I'm testing this functionality (and breaking it probably :-)
+Note: Work in progress ... I'm testing this functionality
 
 # Problems/Change History
 
