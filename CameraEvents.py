@@ -305,7 +305,7 @@ class DahuaDevice():
                         fileext = file[-3:]
                         filesize = fileData["Size"]
                     except Exception as ivsExcept:
-                        _LOGGER.error("Error getting IVS data: " + str(ivsExcept))
+                        _LOGGER.error("Error getting NewFile data: " + str(ivsExcept))
                     payload = { 'Code':Alarm["Code"],'File':file,'Extension':fileext,'Size':filesize }
                     self.client.publish(self.basetopic +"/NewFile/" + Alarm["channel"],payload=json.dumps(payload))
             else:
