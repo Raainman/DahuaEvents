@@ -132,8 +132,7 @@ class DahuaDevice():
             host = self.host,
             port = self.port,
             events = device_cfg.get("events")
-
-       )
+        )
 
 
         self.isNVR = False
@@ -304,13 +303,12 @@ class DahuaDevice():
                         _LOGGER.info("NewFile:["+file+"]")
                         fileext = file[-3:]
                         filesize = fileData["Size"]
-                        if "StoragePoint" not in fileData:
-                            storagepoint = "unknown"
-                        else:
-                            storagepoint = fileData["StoragePoint"]
+                        storagepoint = fileData["StoragePoint"]
+                        #Try to find [A-Z] in filename, this has some meaning like M=Motion ??
+                        filecode = re.findall("[A-Z]",re.findall("\[[A-Z]\]",file)[0])[0]
                     except Exception as ivsExcept:
                         _LOGGER.error("Error getting NewFile data: " + str(ivsExcept))
-                    payload = { 'Code':Alarm["Code"],'File':file,'Extension':fileext,'Size':filesize, 'StoragePoint':storagepoint }
+                    payload = { 'Code':Alarm["Code"],'File':file,'Extension':fileext,'Size':filesize, 'StoragePoint':storagepoint, 'Filecode':filecode }
                     self.client.publish(self.basetopic +"/NewFile/" + Alarm["channel"],payload=json.dumps(payload))
             else:
                 _LOGGER.info("dahua_event_received: "+  Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"])
