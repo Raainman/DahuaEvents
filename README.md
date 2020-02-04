@@ -111,7 +111,7 @@ Currently adding a message for all the files that are broadcasted by the camera.
 Note: My camera's have storage, I have put a Micro-SD in them for local storage. Have not tested if the NVR's also post this event.
 
 ```
-<maintopic>/NewFile/<channel>/{ 'Code':NewFile,'File':"/mnt/sd/2020-02-03/001/dav/16/16.07.20-16.07.50[M][0@0][0].jpg",'Extension':'jpg','Size':6656491, 'StoragePoint':"unknown" } }
+<maintopic>/NewFile/<channel>/{ 'Code':NewFile,'File':"/mnt/sd/2020-02-03/001/dav/16/16.07.20-16.07.50[M][0@0][0].jpg",'Extension':'jpg','Size':6656491, 'StoragePoint':"unknown" }
 ```
 
 If  the file is stored on a storage point other than 'Temporary', then the file can be downloaded bij calling RPC_Loadfile like this;
