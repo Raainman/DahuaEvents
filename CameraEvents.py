@@ -304,19 +304,17 @@ class DahuaDevice():
                         _LOGGER.info("NewFile:["+file+"]")
                         fileext = file[-3:]
                         filesize = fileData["Size"]
+                        if "StoragePoint" not in fileData:
+                            storagepoint = "unknown"
+                        else:
+                            storagepoint = fileData["StoragePoint"]
                     except Exception as ivsExcept:
                         _LOGGER.error("Error getting NewFile data: " + str(ivsExcept))
-                    payload = { 'Code':Alarm["Code"],'File':file,'Extension':fileext,'Size':filesize }
+                    payload = { 'Code':Alarm["Code"],'File':file,'Extension':fileext,'Size':filesize, 'StoragePoint':storagepoint }
                     self.client.publish(self.basetopic +"/NewFile/" + Alarm["channel"],payload=json.dumps(payload))
             else:
                 _LOGGER.info("dahua_event_received: "+  Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"])
                 _LOGGER.info("dahua_event_received Line: "+ Line)
-                # 2020-02-03 16:07:51,147 - __main__ - INFO - dahua_event_received Line: Code=NewFile;action=Pulse;index=0;data={
-                #"File" : "\/mnt\/sd\/2020-02-03\/001\/dav\/16\/16.07.20-16.07.50[M][0@0][0].dav",
-                #"Size" : 6656491,
-                #"StoragePoint" : "NULL"
-                #}
-                #Can be downloaded with: 192.168.1.1/cgi-bin/RPC_Loadfile/mnt/sd/2020-02-03/001/jpg/16/07/20[M][0@0][0].jpg
                 self.client.publish(self.basetopic +"/" + Alarm["channel"] + "/" + Alarm["name"], Alarm["Code"])
 
 class DahuaEventThread(threading.Thread):
