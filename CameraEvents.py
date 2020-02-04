@@ -304,8 +304,11 @@ class DahuaDevice():
                         fileext = file[-3:]
                         filesize = fileData["Size"]
                         storagepoint = fileData["StoragePoint"]
-                        #Try to find [A-Z] in filename, this has some meaning like M=Motion ??
-                        filecode = re.findall("[A-Z]",re.findall("\[[A-Z]\]",file)[0])[0]
+                        #Try to find [A-Z] in filename, this has some meaning like M=Motion, R=Record, F=???
+                        if re.search("\[A-Z]\",file):
+                            filecode = re.findall("[A-Z]",re.findall("\[[A-Z]\]",file)[0])[0]
+                        else:
+                            filecode = '?'
                     except Exception as ivsExcept:
                         _LOGGER.error("Error getting NewFile data: " + str(ivsExcept))
                     payload = { 'Code':Alarm["Code"],'File':file,'Extension':fileext,'Size':filesize, 'StoragePoint':storagepoint, 'Filecode':filecode }
