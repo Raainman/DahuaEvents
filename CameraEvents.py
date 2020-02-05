@@ -309,9 +309,13 @@ class DahuaDevice():
                             filecode = re.findall("[A-Z]",re.findall("\[[A-Z]\]",file)[0])[0]
                         else:
                             filecode = '?'
+                        if re.search("\[[0-9]\]",file):
+                            filesequence = re.findall("[0-9]",re.findall("\[[0-9]\]",file)[0])[0]
+                        else:
+                            filesequence = '0'
                     except Exception as ivsExcept:
                         _LOGGER.error("Error getting NewFile data: " + str(ivsExcept))
-                    payload = { 'Code':Alarm["Code"],'File':file,'Extension':fileext,'Size':filesize, 'StoragePoint':storagepoint, 'Filecode':filecode }
+                    payload = { 'Code':Alarm["Code"],'File':file,'Extension':fileext,'Size':filesize, 'StoragePoint':storagepoint, 'Filecode':filecode, 'Filesequence':filesequence }
                     self.client.publish(self.basetopic +"/NewFile/" + Alarm["channel"],payload=json.dumps(payload))
             else:
                 _LOGGER.info("dahua_event_received: "+  Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"])
