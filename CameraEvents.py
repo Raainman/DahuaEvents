@@ -271,7 +271,7 @@ class DahuaDevice():
             elif Alarm["Code"] ==  "CrossRegionDetection" or Alarm["Code"] == "CrossLineDetection":
                 if Alarm["action"] == "Start" or Alarm["action"] == "Stop" :
                     try:
-                        _LOGGER.info(Alarm["Code"] + Alarm["action"] + " received: " + Alarm["data"])
+                        #_LOGGER.info(Alarm["Code"] + Alarm["action"] + " received: " + Alarm["data"])
                         crossData = json.loads(Alarm["data"])
                         if "Direction" not in crossData:
                             direction = "unknown"
