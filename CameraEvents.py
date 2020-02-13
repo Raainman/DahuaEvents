@@ -316,7 +316,7 @@ class DahuaDevice():
                     except Exception as ivsExcept:
                         _LOGGER.error("Error getting NewFile data: " + str(ivsExcept))
                     payload = { 'Code':Alarm["Code"],'File':file,'Extension':fileext,'Size':filesize, 'StoragePoint':storagepoint, 'Filecode':filecode, 'Filesequence':filesequence }
-                    self.client.publish(self.basetopic +"/NewFile/" + Alarm["channel"],payload=json.dumps(payload))
+                    self.client.publish(self.basetopic +"/NewFile/" + Alarm["channel"] + "/"+fileext,payload=json.dumps(payload))
             else:
                 _LOGGER.info("dahua_event_received: "+  Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"])
                 _LOGGER.info("dahua_event_received Line: "+ Line)
