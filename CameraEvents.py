@@ -263,7 +263,7 @@ class DahuaDevice():
                 RegionName = ', '.join(VideoMotionData["RegionName"])
                 _LOGGER.info("Video Motion received: "+ Alarm["action"] + Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"] + " RegionName: " + RegionName)
                 if Alarm["action"] == "Start":
-                    if not self.client.connected_flag:
+                    while not self.client.connected_flag:
                         self.client.reconnect()
                     self.client.publish(self.basetopic +"/" + Alarm["Code"] + "/" + Alarm["channel"] + "/" + RegionName, "ON")
                 else:
@@ -283,6 +283,8 @@ class DahuaDevice():
                     except Exception as ivsExcept:
                         _LOGGER.error("Error getting IVS data: " + str(ivsExcept))
                     payload = { 'Code':Alarm["Code"],'Direction':direction,'Region':region,'ObjectType':object,'Action':Alarm["action"] }
+                    while not self.client.connected_flag:
+                        self.client.reconnect()
                     self.client.publish(self.basetopic +"/IVS/" + Alarm["channel"],payload=json.dumps(payload))
             elif Alarm["Code"] == "FaceDetection":
                 if Alarm["action"] == "Start" or Alarm["action"] == "Stop" :
@@ -293,6 +295,8 @@ class DahuaDevice():
                     except Exception as ivsExcept:
                         _LOGGER.error("Error getting IVS data: " + str(ivsExcept))
                     payload = { 'Code':Alarm["Code"],'ObjectType':object,'Action':Alarm["action"] }
+                    while not self.client.connected_flag:
+                        self.client.reconnect()
                     self.client.publish(self.basetopic +"/IVS/FaceDetection/" + Alarm["channel"],payload=json.dumps(payload))
             elif Alarm["Code"] == "NewFile":
                 if Alarm["action"] == "Pulse":
@@ -316,10 +320,14 @@ class DahuaDevice():
                     except Exception as ivsExcept:
                         _LOGGER.error("Error getting NewFile data: " + str(ivsExcept))
                     payload = { 'Code':Alarm["Code"],'File':file,'Extension':fileext,'Size':filesize, 'StoragePoint':storagepoint, 'Filecode':filecode, 'Filesequence':filesequence }
+                    while not self.client.connected_flag:
+                        self.client.reconnect()
                     self.client.publish(self.basetopic +"/NewFile/" + Alarm["channel"] + "/"+fileext,payload=json.dumps(payload))
             else:
                 _LOGGER.info("dahua_event_received: "+  Alarm["name"] + " Index: " + Alarm["channel"] + " Code: " + Alarm["Code"])
                 _LOGGER.info("dahua_event_received Line: "+ Line)
+                while not self.client.connected_flag:
+                    self.client.reconnectreconnect()
                 self.client.publish(self.basetopic +"/" + Alarm["channel"] + "/" + Alarm["name"], Alarm["Code"])
 
 class DahuaEventThread(threading.Thread):
@@ -400,7 +408,7 @@ class DahuaEventThread(threading.Thread):
             heartbeat = heartbeat + 1
             if heartbeat % 1000 == 0:
                 _LOGGER.debug("Heartbeat: " + str(datetime.datetime.now()))
-                if not self.client.connected_flag:
+                while not self.client.connected_flag:
                     self.client.reconnect()
                 self.client.publish(self.basetopic +"/$heartbeat", str(datetime.datetime.now()))
 
